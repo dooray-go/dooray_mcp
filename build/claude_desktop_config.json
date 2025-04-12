@@ -1,0 +1,11 @@
+{
+    "mcpServers": {
+        "dooray": {
+            "command": "/Users/zbum/IdeaProjects/dooray_mcp/dooray",
+            "args": [
+                "--token",
+                "your token from Dooray Settings."
+            ]
+        }
+    }
+}
