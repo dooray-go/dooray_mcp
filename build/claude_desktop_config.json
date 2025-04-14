@@ -1,7 +1,7 @@
 {
     "mcpServers": {
         "dooray": {
-            "command": "/Users/zbum/IdeaProjects/dooray_mcp/dooray",
+            "command": "/Users/zbum/IdeaProjects/dooray_mcp/build/dooray.darwin.arm64",
             "args": [
                 "--token",
                 "your token from Dooray Settings."
