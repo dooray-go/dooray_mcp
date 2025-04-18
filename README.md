@@ -7,6 +7,9 @@
 * https://github.com/dooray-go/dooray_mcp/releases
 
 ## 설정하기 
+* MCP를 지원하는 Claude.ai 데스크탑 애플리케이션을 설치합니다.
+* https://claude.ai/download
+<br />
 * Claude.ai 데스크탑 애플리케이션에서 설정 > 개발자 > 설정 편집 을 선택합니다. 
 ![img.png](img.png)
 * 설정파일을 다음과 같이 편집합니다. 
@@ -30,5 +33,5 @@
 * 이제 Claude.ai 데스크탑 애플리케이션에서 Dooray! MCP 를 사용할 수 있습니다.
 * 다음을 Claude.ai 에 말해 보세요.
 ```shell
-오늘 내 일정을 중요한 순으로 분류해서 김XX 에게 메신저로 보내 줘.
+오늘 내 일정을 중요한 순으로 정렬해서 김XX 에게 메신저로 보내 줘.
 ```
