@@ -9,11 +9,12 @@
 ## 설정하기 
 * MCP를 지원하는 Claude.ai 데스크탑 애플리케이션을 설치합니다.
 * https://claude.ai/download
-<br />
+
 * Claude.ai 데스크탑 애플리케이션에서 설정 > 개발자 > 설정 편집 을 선택합니다. 
 ![img.png](img.png)
 * 설정파일을 다음과 같이 편집합니다. 
 * claude_desktop_config.json
+
  ```json
 {
     "mcpServers": {
