@@ -1,7 +1,7 @@
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/dooray-go/dooray v0.1.0 h1:xI8OiEgX8eHi8zvGWu+5Q0OP5aD82a/UZs2liPcF59w=
-github.com/dooray-go/dooray v0.1.0/go.mod h1:41l4aZ1/66stsE/CKPcsiTqsfIjR0BmlnSwvKMozMDQ=
+github.com/dooray-go/dooray v0.1.2 h1:sB2uuRMT5remOTPRpr6EWhH3ZzsfPRPIzIZOqjCiX+4=
+github.com/dooray-go/dooray v0.1.2/go.mod h1:41l4aZ1/66stsE/CKPcsiTqsfIjR0BmlnSwvKMozMDQ=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
 github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/mark3labs/mcp-go v0.18.0 h1:YuhgIVjNlTG2ZOwmrkORWyPTp0dz1opPEqvsPtySXao=
