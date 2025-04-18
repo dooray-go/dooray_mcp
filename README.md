@@ -6,14 +6,16 @@
 * 릴리즈에서 PC의 아키텍쳐에 해당하는 바이너리를 다운로드 합니다. 
 * https://github.com/dooray-go/dooray_mcp/releases
 
-## 설정하기 
-* MCP를 지원하는 Claude.ai 데스크탑 애플리케이션을 설치합니다.
-* https://claude.ai/download
+## 설정하기
+* Claude 설치
+  * MCP를 지원하는 Claude.ai 데스크탑 애플리케이션을 설치합니다.
+  * https://claude.ai/download
 
-* Claude.ai 데스크탑 애플리케이션에서 설정 > 개발자 > 설정 편집 을 선택합니다. 
-![img.png](img.png)
-* 설정파일을 다음과 같이 편집합니다. 
-* claude_desktop_config.json
+* MCP 설정
+  * Claude.ai 데스크탑 애플리케이션에서 설정 > 개발자 > 설정 편집 을 선택합니다. 
+  ![img.png](img.png)
+  * 설정파일을 다음과 같이 편집합니다. 
+  * claude_desktop_config.json
 
  ```json
 {
