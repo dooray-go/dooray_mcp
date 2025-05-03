@@ -45,10 +45,11 @@ func ProjectTools(s *server.MCPServer, token *string) {
 		switch op {
 		case "find_projects":
 			var err error
-			result, err = project.NewDefaultProject().GetProjects(*token, projectType, scope, state)
+			res, err := project.NewDefaultProject().GetProjects(*token, projectType, scope, state)
 			if err != nil {
 				return nil, err
 			}
+			result = res.RawJSON
 		}
 		return mcp.NewToolResultText(fmt.Sprintf("%s", result)), nil
 	})
