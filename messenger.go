@@ -35,7 +35,7 @@ func MessengerTools(s *server.MCPServer, token *string) {
 		var result string
 		switch op {
 		case "send":
-			err := messenger.NewDefaultMessenger().DirectSend(*token,
+			res, err := messenger.NewDefaultMessenger().DirectSend(*token,
 				&messenger.DirectSendRequest{
 					Text:                 message,
 					OrganizationMemberId: to,
@@ -44,7 +44,7 @@ func MessengerTools(s *server.MCPServer, token *string) {
 			if err != nil {
 				return nil, err
 			}
-			result = "Message sent successfully"
+			result = res.RawJSON
 		}
 		return mcp.NewToolResultText(fmt.Sprintf("%s", result)), nil
 	})

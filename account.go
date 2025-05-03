@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/dooray-go/dooray/openapi/account"
+	model "github.com/dooray-go/dooray/openapi/model/account"
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
 )
@@ -34,7 +35,7 @@ func AccountTools(s *server.MCPServer, token *string) {
 			userCode = ""
 		}
 
-		var result string
+		var result *model.GetMembersResponse
 		switch op {
 		case "find_member_id":
 			var err error
@@ -43,7 +44,7 @@ func AccountTools(s *server.MCPServer, token *string) {
 				return nil, err
 			}
 		}
-		return mcp.NewToolResultText(fmt.Sprintf("%s", result)), nil
+		return mcp.NewToolResultText(fmt.Sprintf("%s", result.RawJSON)), nil
 	})
 
 	accountGetMember := mcp.NewTool("dooray_account_member",
@@ -63,7 +64,7 @@ func AccountTools(s *server.MCPServer, token *string) {
 		op := request.Params.Arguments["operation"].(string)
 		memberId := request.Params.Arguments["member_id"].(string)
 
-		var result string
+		var result *model.GetMemberResponse
 		switch op {
 		case "find_member_details":
 			var err error
@@ -72,6 +73,6 @@ func AccountTools(s *server.MCPServer, token *string) {
 				return nil, err
 			}
 		}
-		return mcp.NewToolResultText(fmt.Sprintf("%s", result)), nil
+		return mcp.NewToolResultText(fmt.Sprintf("%s", result.RawJSON)), nil
 	})
 }

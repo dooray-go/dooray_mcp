@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/dooray-go/dooray/openapi/calendar"
+	model "github.com/dooray-go/dooray/openapi/model/calendar"
 	"github.com/dooray-go/dooray/utils"
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
@@ -27,11 +28,12 @@ func CalendarTools(s *server.MCPServer, token *string) {
 		switch op {
 		case "find_calendars":
 			var err error
-			result, err = calendar.NewDefaultCalendar().GetCalendars(*token)
+			res, err := calendar.NewDefaultCalendar().GetCalendars(*token)
 			if err != nil {
 				return nil, err
 			}
 
+			result = res.RawJSON
 		}
 
 		return mcp.NewToolResultText(fmt.Sprintf("%s", result)), nil
@@ -60,7 +62,7 @@ func CalendarTools(s *server.MCPServer, token *string) {
 	s.AddTool(calendarGetEvents, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		op := request.Params.Arguments["operation"].(string)
 
-		var result string
+		var result *model.EventsResponse
 		switch op {
 		case "find_events":
 			calendars, ok := request.Params.Arguments["calendars"].(string)
@@ -92,7 +94,7 @@ func CalendarTools(s *server.MCPServer, token *string) {
 			}
 		}
 
-		return mcp.NewToolResultText(fmt.Sprintf("%s", result)), nil
+		return mcp.NewToolResultText(fmt.Sprintf("%s", result.RawJSON)), nil
 	})
 
 	calendarPostEvent := mcp.NewTool("dooray_calendar_post_event",
@@ -126,7 +128,7 @@ func CalendarTools(s *server.MCPServer, token *string) {
 	s.AddTool(calendarPostEvent, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		op := request.Params.Arguments["operation"].(string)
 
-		var result string
+		var result *model.EventResponse
 		switch op {
 		case "create_event":
 			calendarId, ok := request.Params.Arguments["calendarId"].(string)
@@ -162,10 +164,10 @@ func CalendarTools(s *server.MCPServer, token *string) {
 				return nil, err
 			}
 
-			event := calendar.EventRequest{
-				Users:            calendar.Users{},
+			event := model.EventRequest{
+				Users:            model.Users{},
 				Subject:          subject,
-				Body:             calendar.Body{MimeType: "text/html", Content: content},
+				Body:             model.Body{MimeType: "text/html", Content: content},
 				StartedAt:        utils.JsonTime(startedAtTime),
 				EndedAt:          utils.JsonTime(endedAtTime),
 				WholeDayFlag:     false,
@@ -180,6 +182,6 @@ func CalendarTools(s *server.MCPServer, token *string) {
 			}
 		}
 
-		return mcp.NewToolResultText(fmt.Sprintf("%s", result)), nil
+		return mcp.NewToolResultText(fmt.Sprintf("%s", result.RawJSON)), nil
 	})
 }
