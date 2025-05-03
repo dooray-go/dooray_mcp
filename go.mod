@@ -2,10 +2,10 @@ module dooray_mcp
 
 go 1.23
 
-replace github.com/dooray-go/dooray v0.1.2 => ../dooray-go
+//replace github.com/dooray-go/dooray v0.2.0 => ../dooray-go
 
 require (
-	github.com/dooray-go/dooray v0.1.2
+	github.com/dooray-go/dooray v0.2.0
 	github.com/mark3labs/mcp-go v0.18.0
 )
 
