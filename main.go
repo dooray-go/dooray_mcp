@@ -23,6 +23,8 @@ func main() {
 		server.WithLogging(),
 	)
 
+	OsTools(s, token)
+
 	MessengerTools(s, token)
 
 	AccountTools(s, token)
