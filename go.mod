@@ -5,7 +5,7 @@ go 1.23
 //replace github.com/dooray-go/dooray v0.2.0 => ../dooray-go
 
 require (
-	github.com/dooray-go/dooray v0.2.0
+	github.com/dooray-go/dooray v0.2.1
 	github.com/mark3labs/mcp-go v0.18.0
 )
 
