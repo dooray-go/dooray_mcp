@@ -22,7 +22,6 @@ func AccountTools(s *server.MCPServer, token *string) {
 			mcp.Description("member name"),
 		),
 		mcp.WithString("user_code",
-			mcp.Required(),
 			mcp.Description("user code, user code is composed of english letters and numbers, and the length is 4-20 characters"),
 		),
 	)
