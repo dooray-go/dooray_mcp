@@ -1,3 +1,5 @@
 *.iml
 .idea
 build/dooray.*
+dist/
+.mcp.json
