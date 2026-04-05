@@ -27,9 +27,9 @@ func AccountTools(s *server.MCPServer, token *string) {
 	)
 
 	s.AddTool(accountGetMembers, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-		op := request.Params.Arguments["operation"].(string)
-		memberName := request.Params.Arguments["member_name"].(string)
-		userCode, ok := request.Params.Arguments["user_code"].(string)
+		op := request.GetArguments()["operation"].(string)
+		memberName := request.GetArguments()["member_name"].(string)
+		userCode, ok := request.GetArguments()["user_code"].(string)
 		if !ok {
 			userCode = ""
 		}
@@ -60,8 +60,8 @@ func AccountTools(s *server.MCPServer, token *string) {
 	)
 
 	s.AddTool(accountGetMember, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-		op := request.Params.Arguments["operation"].(string)
-		memberId := request.Params.Arguments["member_id"].(string)
+		op := request.GetArguments()["operation"].(string)
+		memberId := request.GetArguments()["member_id"].(string)
 
 		var result *model.GetMemberResponse
 		switch op {

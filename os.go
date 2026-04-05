@@ -21,7 +21,7 @@ func OsTools(s *server.MCPServer, token *string) {
 
 	// Add the calculator handler
 	s.AddTool(osTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-		op := request.Params.Arguments["operation"].(string)
+		op := request.GetArguments()["operation"].(string)
 
 		var result string
 		switch op {

@@ -22,7 +22,7 @@ func CalendarTools(s *server.MCPServer, token *string) {
 	)
 
 	s.AddTool(calendarGetCalendars, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-		op := request.Params.Arguments["operation"].(string)
+		op := request.GetArguments()["operation"].(string)
 
 		var result string
 		switch op {
@@ -60,20 +60,20 @@ func CalendarTools(s *server.MCPServer, token *string) {
 	)
 
 	s.AddTool(calendarGetEvents, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-		op := request.Params.Arguments["operation"].(string)
+		op := request.GetArguments()["operation"].(string)
 
 		var result *model.EventsResponse
 		switch op {
 		case "find_events":
-			calendars, ok := request.Params.Arguments["calendars"].(string)
+			calendars, ok := request.GetArguments()["calendars"].(string)
 			if !ok {
 				calendars = ""
 			}
-			timeMin, ok := request.Params.Arguments["timeMin"].(string)
+			timeMin, ok := request.GetArguments()["timeMin"].(string)
 			if !ok {
 				timeMin = ""
 			}
-			timeMax, ok := request.Params.Arguments["timeMax"].(string)
+			timeMax, ok := request.GetArguments()["timeMax"].(string)
 			if !ok {
 				timeMax = ""
 			}
@@ -126,30 +126,30 @@ func CalendarTools(s *server.MCPServer, token *string) {
 	)
 
 	s.AddTool(calendarPostEvent, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-		op := request.Params.Arguments["operation"].(string)
+		op := request.GetArguments()["operation"].(string)
 
 		var result *model.EventResponse
 		switch op {
 		case "create_event":
-			calendarId, ok := request.Params.Arguments["calendarId"].(string)
+			calendarId, ok := request.GetArguments()["calendarId"].(string)
 			if !ok {
 				calendarId = ""
 			}
 
-			subject, ok := request.Params.Arguments["subject"].(string)
+			subject, ok := request.GetArguments()["subject"].(string)
 			if !ok {
 				subject = ""
 			}
-			content, ok := request.Params.Arguments["content"].(string)
+			content, ok := request.GetArguments()["content"].(string)
 			if !ok {
 				content = ""
 			}
 
-			startedAt, ok := request.Params.Arguments["startedAt"].(string)
+			startedAt, ok := request.GetArguments()["startedAt"].(string)
 			if !ok {
 				startedAt = ""
 			}
-			endedAt, ok := request.Params.Arguments["endedAt"].(string)
+			endedAt, ok := request.GetArguments()["endedAt"].(string)
 			if !ok {
 				endedAt = ""
 			}

@@ -28,9 +28,9 @@ func MessengerTools(s *server.MCPServer, token *string) {
 
 	// Add the calculator handler
 	s.AddTool(doorayMessengerTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-		op := request.Params.Arguments["operation"].(string)
-		to := request.Params.Arguments["to"].(string)
-		message := request.Params.Arguments["message"].(string)
+		op := request.GetArguments()["operation"].(string)
+		to := request.GetArguments()["to"].(string)
+		message := request.GetArguments()["message"].(string)
 
 		var result string
 		switch op {
