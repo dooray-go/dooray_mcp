@@ -3,7 +3,7 @@ module dooray_mcp
 go 1.26
 
 require (
-	github.com/dooray-go/dooray v0.3.1
+	github.com/dooray-go/dooray v0.3.2
 	github.com/mark3labs/mcp-go v0.47.0
 )
 
