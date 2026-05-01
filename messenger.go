@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/dooray-go/dooray/openapi/messenger"
+	"github.com/dooray-go/dooray-sdk/openapi/messenger"
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
 )

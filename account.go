@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/dooray-go/dooray/openapi/account"
-	model "github.com/dooray-go/dooray/openapi/model/account"
+	"github.com/dooray-go/dooray-sdk/openapi/account"
+	model "github.com/dooray-go/dooray-sdk/openapi/model/account"
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
 )

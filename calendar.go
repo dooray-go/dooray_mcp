@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/dooray-go/dooray/openapi/calendar"
-	model "github.com/dooray-go/dooray/openapi/model/calendar"
-	"github.com/dooray-go/dooray/utils"
+	"github.com/dooray-go/dooray-sdk/openapi/calendar"
+	model "github.com/dooray-go/dooray-sdk/openapi/model/calendar"
+	"github.com/dooray-go/dooray-sdk/utils"
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
 )
