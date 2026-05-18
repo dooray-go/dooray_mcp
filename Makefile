@@ -10,9 +10,11 @@ $(OUTPUT_DIR):
 
 darwin-amd64: $(OUTPUT_DIR)
 	GOOS=darwin GOARCH=amd64 go build -o $(OUTPUT_DIR)/$(BINARY_NAME).darwin.amd64 .
+	@command -v codesign >/dev/null && codesign --force --sign - $(OUTPUT_DIR)/$(BINARY_NAME).darwin.amd64 || echo "codesign not available, skipping"
 
 darwin-arm64: $(OUTPUT_DIR)
 	GOOS=darwin GOARCH=arm64 go build -o $(OUTPUT_DIR)/$(BINARY_NAME).darwin.arm64 .
+	@command -v codesign >/dev/null && codesign --force --sign - $(OUTPUT_DIR)/$(BINARY_NAME).darwin.arm64 || echo "codesign not available, skipping"
 
 linux-amd64: $(OUTPUT_DIR)
 	GOOS=linux GOARCH=amd64 go build -o $(OUTPUT_DIR)/$(BINARY_NAME).linux.amd64 .
