@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"strings"
 
+	model "github.com/dooray-go/dooray-sdk/openapi/model/project"
 	"github.com/dooray-go/dooray-sdk/openapi/project"
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
@@ -66,12 +68,43 @@ func postTools(s *server.MCPServer, token *string) {
 		mcp.WithDescription("find dooray posts in projects"),
 		mcp.WithString("operation",
 			mcp.Required(),
-			mcp.Description("The operation to perform (find dooray posts in projects)"),
-			mcp.Enum("find_posts"),
+			mcp.Description("The operation to perform. 'find_posts': list posts with filters. 'create_post': create a new post (requires subject, bodyContent)"),
+			mcp.Enum("find_posts", "create_post"),
 		),
 		mcp.WithString("projectId",
 			mcp.Required(),
 			mcp.Description("project id, it can be a single id or a comma separated list of projectIds. it can be obtained from the find_projects tool"),
+		),
+		// create_post fields
+		mcp.WithString("subject",
+			mcp.Description("post subject/title (required for create_post)"),
+		),
+		mcp.WithString("bodyContent",
+			mcp.Description("post body markdown/html content (required for create_post)"),
+		),
+		mcp.WithString("bodyMimeType",
+			mcp.Description("post body mime type for create_post: 'text/x-markdown' (default) or 'text/html'"),
+		),
+		mcp.WithString("toMemberIdsCreate",
+			mcp.Description("assignee organizationMemberIds for create_post, comma separated. type=member"),
+		),
+		mcp.WithString("ccMemberIdsCreate",
+			mcp.Description("cc organizationMemberIds for create_post, comma separated. type=member"),
+		),
+		mcp.WithString("tagIdsCreate",
+			mcp.Description("tag ids for create_post, comma separated"),
+		),
+		mcp.WithString("priority",
+			mcp.Description("priority for create_post: urgent | high | normal | low"),
+		),
+		mcp.WithString("parentPostIdCreate",
+			mcp.Description("parent post id for create_post (sub-task)"),
+		),
+		mcp.WithString("milestoneIdCreate",
+			mcp.Description("milestone id for create_post"),
+		),
+		mcp.WithString("workflowId",
+			mcp.Description("workflow id for create_post"),
 		),
 		// Paging
 		mcp.WithNumber("page",
@@ -208,6 +241,81 @@ func postTools(s *server.MCPServer, token *string) {
 		switch op {
 		case "find_posts":
 			res, err := project.NewDefaultProject().GetPostsWithOptions(*token, projectId, opts)
+			if err != nil {
+				return nil, err
+			}
+			result = res.RawJSON
+		case "create_post":
+			subject, _ := request.GetArguments()["subject"].(string)
+			bodyContent, _ := request.GetArguments()["bodyContent"].(string)
+			if subject == "" || bodyContent == "" {
+				return mcp.NewToolResultError("subject and bodyContent are required for create_post"), nil
+			}
+			bodyMimeType, _ := request.GetArguments()["bodyMimeType"].(string)
+			if bodyMimeType == "" {
+				bodyMimeType = "text/x-markdown"
+			}
+
+			post := model.PostRequest{
+				Subject: subject,
+				Body: model.PostBody{
+					MimeType: bodyMimeType,
+					Content:  bodyContent,
+				},
+			}
+
+			if v, _ := request.GetArguments()["priority"].(string); v != "" {
+				post.Priority = v
+			}
+			if v, _ := request.GetArguments()["parentPostIdCreate"].(string); v != "" {
+				post.ParentPostID = v
+			}
+			if v, _ := request.GetArguments()["milestoneIdCreate"].(string); v != "" {
+				post.MilestoneID = v
+			}
+			if v, _ := request.GetArguments()["workflowId"].(string); v != "" {
+				post.WorkflowID = v
+			}
+			if v, _ := request.GetArguments()["tagIdsCreate"].(string); v != "" {
+				for _, id := range strings.Split(v, ",") {
+					id = strings.TrimSpace(id)
+					if id != "" {
+						post.TagIDs = append(post.TagIDs, id)
+					}
+				}
+			}
+
+			users := &model.PostUsers{}
+			hasUsers := false
+			if v, _ := request.GetArguments()["toMemberIdsCreate"].(string); v != "" {
+				for _, id := range strings.Split(v, ",") {
+					id = strings.TrimSpace(id)
+					if id != "" {
+						users.To = append(users.To, model.PostRecipient{
+							Type:   "member",
+							Member: &model.PostMember{OrganizationMemberID: id},
+						})
+						hasUsers = true
+					}
+				}
+			}
+			if v, _ := request.GetArguments()["ccMemberIdsCreate"].(string); v != "" {
+				for _, id := range strings.Split(v, ",") {
+					id = strings.TrimSpace(id)
+					if id != "" {
+						users.Cc = append(users.Cc, model.PostRecipient{
+							Type:   "member",
+							Member: &model.PostMember{OrganizationMemberID: id},
+						})
+						hasUsers = true
+					}
+				}
+			}
+			if hasUsers {
+				post.Users = users
+			}
+
+			res, err := project.NewDefaultProject().CreatePost(*token, projectId, post)
 			if err != nil {
 				return nil, err
 			}
