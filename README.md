@@ -9,6 +9,9 @@ Dooray! 를 Claude 등 MCP 호환 AI 클라이언트에서 사용할 수 있도�
 | 분류 | 기능 | 관련 도구 |
 |------|------|-----------|
 | 메신저 | 다른 멤버에게 DM 전송 | `dooray_messenger` |
+| 메신저 | 채널에 메시지 전송 | `dooray_messenger` |
+| 메신저 | 내가 속한 채널 목록 조회 | `dooray_messenger` |
+| 메신저 | 채널의 최근 메시지 조회 | `dooray_messenger` |
 | 캘린더 | 내 캘린더 목록 조회 | `dooray_calendar_calendars` |
 | 캘린더 | 기간별 일정 조회 | `dooray_calendar_events` |
 | 캘린더 | 일정 등록 (종일/반복일정 지원) | `dooray_calendar_post_event` |
@@ -16,6 +19,7 @@ Dooray! 를 Claude 등 MCP 호환 AI 클라이언트에서 사용할 수 있도�
 | 계정 | 멤버 상세정보 조회 | `dooray_account_member` |
 | 프로젝트 | 참여 중인 프로젝트 조회 | `dooray_project` |
 | 프로젝트 | 업무(포스트) 검색 (담당자/상태/기한 필터) | `dooray_posts` |
+| 프로젝트 | 업무(포스트) 등록 (담당자/참조자/태그/우선순위 지정) | `dooray_posts` |
 | 기타 | 현재 시각 조회 | `os` |
 
 반복 일정은 `daily / weekly / monthly / yearly` 주기, interval, 종료일, 요일/일자 지정까지 지원합니다.
@@ -135,6 +139,18 @@ claude "오늘 내 캘린더 일정을 알려줘"
 정만티에게 "회의 시작합니다" 라고 DM 보내줘.
 ```
 
+```
+"개발팀" 채널에 배포 시작한다고 알려줘.
+```
+
+```
+내가 들어가 있는 채널 목록 보여줘.
+```
+
+```
+"공지" 채널 최근 메시지 20개 요약해 줘.
+```
+
 ### 캘린더 조회
 
 ```
@@ -175,15 +191,23 @@ Dooray-잘쓰자 프로젝트에서 내게 할당된 업무 중 이번 주 마�
 지난 30일간 생성된 내 업무를 상태별로 정리해 줘.
 ```
 
+```
+Dooray-잘쓰자 프로젝트에 "릴리즈 회고" 업무를 만들어줘. 담당자는 정만티, 우선순위는 high.
+```
+
 ## 도구 레퍼런스
 
 ### `dooray_messenger`
 
+DM 전송, 채널 메시지 전송, 채널 목록/로그 조회를 하나의 도구로 처리합니다.
+
 | 파라미터 | 필수 | 설명 |
 |----------|------|------|
-| operation | O | `send` |
-| to | O | 수신자의 organizationMemberId |
-| message | O | 보낼 메시지 본문 |
+| operation | O | `send` (DM), `send_channel` (채널 메시지), `find_channels` (채널 목록), `find_channel_logs` (채널 메시지 조회) |
+| to | △ | 수신자의 organizationMemberId (`send` 에서 필수) |
+| message | △ | 보낼 메시지 본문 (`send`, `send_channel` 에서 필수) |
+| channelId | △ | 채널 ID (`send_channel`, `find_channel_logs` 에서 필수) |
+| limit | X | `find_channel_logs` 에서 가져올 메시지 최대 개수 (기본 50) |
 
 ### `dooray_calendar_calendars`
 
@@ -237,12 +261,19 @@ Dooray-잘쓰자 프로젝트에서 내게 할당된 업무 중 이번 주 마�
 
 ### `dooray_posts`
 
-업무(포스트) 검색 도구. `projectId` 만 필수이며, 나머지는 필터로 사용됩니다.
+업무(포스트) 검색과 등록을 모두 지원합니다.
+
+**공통**
 
 | 파라미터 | 설명 |
 |----------|------|
-| operation | `find_posts` (필수) |
-| projectId | 프로젝트 ID (필수, 쉼표로 여러 개 지정 가능) |
+| operation | `find_posts` (검색) 또는 `create_post` (등록) (필수) |
+| projectId | 프로젝트 ID (필수, 검색 시 쉼표로 여러 개 지정 가능) |
+
+**`find_posts` 필터**
+
+| 파라미터 | 설명 |
+|----------|------|
 | page / size | 페이지(기본 0), 페이지 크기(기본 20, 최대 100) |
 | fromEmailAddress | 보낸 사람 이메일로 필터 |
 | fromMemberIds | 작성자 memberId (쉼표 구분) |
@@ -258,6 +289,21 @@ Dooray-잘쓰자 프로젝트에서 내게 할당된 업무 중 이번 주 마�
 | subjects | 제목 키워드 |
 | createdAt / updatedAt / dueAt | 날짜 필터. `today`, `thisweek`, `prev-30d`, `next-7d`, 또는 ISO8601 구간 `~` 형식 |
 | order | 정렬: `postDueAt`, `postUpdatedAt`, `createdAt` (내림차순은 `-` 접두사) |
+
+**`create_post` 파라미터**
+
+| 파라미터 | 필수 | 설명 |
+|----------|------|------|
+| subject | O | 업무 제목 |
+| bodyContent | O | 업무 본문 |
+| bodyMimeType | X | `text/x-markdown` (기본) 또는 `text/html` |
+| toMemberIdsCreate | X | 담당자 organizationMemberId 목록 (쉼표 구분) |
+| ccMemberIdsCreate | X | 참조자 organizationMemberId 목록 (쉼표 구분) |
+| tagIdsCreate | X | 태그 ID 목록 (쉼표 구분) |
+| priority | X | `urgent` / `high` / `normal` / `low` |
+| parentPostIdCreate | X | 상위 업무 ID (하위 업무로 등록) |
+| milestoneIdCreate | X | 마일스톤 ID |
+| workflowId | X | 워크플로 ID |
 
 ### `os`
 
