@@ -3,3 +3,5 @@
 build/dooray.*
 dist/
 .mcp.json
+# 빌드 산출물(로컬 빌드)
+dooray_mcp

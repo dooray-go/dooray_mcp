@@ -19,7 +19,11 @@ Dooray! 를 Claude 등 MCP 호환 AI 클라이언트에서 사용할 수 있도�
 | 계정 | 멤버 상세정보 조회 | `dooray_account_member` |
 | 프로젝트 | 참여 중인 프로젝트 조회 | `dooray_project` |
 | 프로젝트 | 업무(포스트) 검색 (담당자/상태/기한 필터) | `dooray_posts` |
+| 프로젝트 | 업무(포스트) 단건 조회 (본문 포함) | `dooray_posts` |
 | 프로젝트 | 업무(포스트) 등록 (담당자/참조자/태그/우선순위 지정) | `dooray_posts` |
+| 프로젝트 | 업무(포스트) 수정 (제목/본문/담당자/태그 — 전체 치환) | `dooray_posts` |
+| 프로젝트 | 업무 상태(워크플로) 변경 | `dooray_posts` |
+| 프로젝트 | 업무 댓글(로그) 작성·조회 | `dooray_posts` |
 | 기타 | 현재 시각 조회 | `os` |
 
 반복 일정은 `daily / weekly / monthly / yearly` 주기, interval, 종료일, 요일/일자 지정까지 지원합니다.
@@ -261,13 +265,13 @@ DM 전송, 채널 메시지 전송, 채널 목록/로그 조회를 하나의 도
 
 ### `dooray_posts`
 
-업무(포스트) 검색과 등록을 모두 지원합니다.
+업무(포스트) 검색·조회·등록·수정·상태변경·댓글을 지원합니다.
 
 **공통**
 
 | 파라미터 | 설명 |
 |----------|------|
-| operation | `find_posts` (검색) 또는 `create_post` (등록) (필수) |
+| operation | `find_posts`(검색) / `get_post`(단건 조회) / `create_post`(등록) / `update_post`(수정) / `set_workflow`(상태 변경) / `create_log`(댓글 작성) / `get_logs`(댓글 조회) (필수) |
 | projectId | 프로젝트 ID (필수, 검색 시 쉼표로 여러 개 지정 가능) |
 
 **`find_posts` 필터**
@@ -304,6 +308,50 @@ DM 전송, 채널 메시지 전송, 채널 목록/로그 조회를 하나의 도
 | parentPostIdCreate | X | 상위 업무 ID (하위 업무로 등록) |
 | milestoneIdCreate | X | 마일스톤 ID |
 | workflowId | X | 워크플로 ID |
+
+**`get_post` 파라미터** — 단건 업무를 본문 포함 전체 조회
+
+| 파라미터 | 필수 | 설명 |
+|----------|------|------|
+| postId | O | 업무 ID |
+
+**`update_post` 파라미터** — 업무 수정
+
+> ⚠️ `update_post`는 **전체 치환(full replacement)** 입니다. 전송한 키만 갱신되고, `users`(to/cc)를 보내면 그 안의 to/cc가 통째로 교체됩니다. 키를 생략하면 기존 값이 보존됩니다. subject/bodyContent는 필수이므로, 먼저 `get_post`로 현재 값을 읽어 **그대로 다시 보내야** 데이터가 유실되지 않습니다.
+
+| 파라미터 | 필수 | 설명 |
+|----------|------|------|
+| postId | O | 업무 ID |
+| subject | O | 업무 제목 (생략 시 비워짐) |
+| bodyContent | O | 업무 본문 (생략 시 비워짐) |
+| bodyMimeType | X | `text/x-markdown` (기본) 또는 `text/html` |
+| toMemberIdsCreate | X | 담당자 organizationMemberId 목록. 보내면 to가 교체됨. 담당자를 유지하려면 생략 |
+| ccMemberIdsCreate | X | 참조자 organizationMemberId 목록 |
+| tagIdsCreate | X | 태그 ID 목록. 보내면 태그가 교체되므로 기존+신규를 합쳐서 전송 |
+| priority | X | `urgent` / `high` / `normal` / `low` |
+| toMemberWorkflowId | X | to 담당자에 인라인 workflow.id 부착. ※Dooray는 update PUT에서 이 값을 무시하므로 상태 변경은 `set_workflow`를 쓸 것 |
+
+**`set_workflow` 파라미터** — 업무 상태(워크플로) 변경 (내부적으로 `POST .../set-workflow`)
+
+| 파라미터 | 필수 | 설명 |
+|----------|------|------|
+| postId | O | 업무 ID |
+| setWorkflowId | O | 변경할 워크플로 ID (해당 프로젝트의 `GET .../workflows`에서 조회) |
+
+**`create_log` 파라미터** — 업무에 댓글(로그) 작성
+
+| 파라미터 | 필수 | 설명 |
+|----------|------|------|
+| postId | O | 업무 ID |
+| logContent | O | 댓글 본문 (멘션: `[@이름](dooray://{orgId}/members/{memberId} "member")`) |
+| logMimeType | X | `text/x-markdown` (기본) 또는 `text/html` |
+
+**`get_logs` 파라미터** — 업무 댓글(로그) 목록 조회
+
+| 파라미터 | 필수 | 설명 |
+|----------|------|------|
+| postId | O | 업무 ID |
+| page / size | X | 페이지(기본 0), 페이지 크기(기본 20) |
 
 ### `os`
 

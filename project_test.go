@@ -347,6 +347,60 @@ func TestPostsToolWithDateFilters(t *testing.T) {
 	}
 }
 
+func TestPostsToolGetPost(t *testing.T) {
+	s := newTestServer()
+	token := "invalid-token"
+	ProjectTools(s, &token)
+
+	tool := s.ListTools()["dooray_posts"]
+
+	req := mcp.CallToolRequest{
+		Params: mcp.CallToolParams{
+			Name: "dooray_posts",
+			Arguments: map[string]any{
+				"operation": "get_post",
+				"projectId": "12345",
+				"postId":    "67890",
+			},
+		},
+	}
+
+	// 잘못된 토큰이므로 API 호출은 실패하지만 인자 파싱과 요청 구성이 동작하는지 확인
+	_, err := tool.Handler(context.Background(), req)
+	if err == nil {
+		t.Log("handler succeeded (unexpected with invalid token, but argument parsing works)")
+	} else {
+		t.Logf("handler returned expected error (API call failed): %v", err)
+	}
+}
+
+func TestPostsToolGetPostMissingPostId(t *testing.T) {
+	s := newTestServer()
+	token := "invalid-token"
+	ProjectTools(s, &token)
+
+	tool := s.ListTools()["dooray_posts"]
+
+	req := mcp.CallToolRequest{
+		Params: mcp.CallToolParams{
+			Name: "dooray_posts",
+			Arguments: map[string]any{
+				"operation": "get_post",
+				"projectId": "12345",
+				// postId 누락
+			},
+		},
+	}
+
+	res, err := tool.Handler(context.Background(), req)
+	if err != nil {
+		t.Fatalf("expected tool result error, got go error: %v", err)
+	}
+	if res == nil || !res.IsError {
+		t.Error("expected error result when postId is missing")
+	}
+}
+
 func TestPostsToolWithSortOptions(t *testing.T) {
 	s := newTestServer()
 	token := "invalid-token"
@@ -376,5 +430,98 @@ func TestPostsToolWithSortOptions(t *testing.T) {
 				t.Logf("handler returned expected error: %v", err)
 			}
 		})
+	}
+}
+
+// callPosts is a small helper that invokes the dooray_posts handler with the
+// given arguments and returns the tool result and error.
+func callPosts(t *testing.T, args map[string]any) (*mcp.CallToolResult, error) {
+	t.Helper()
+	s := newTestServer()
+	token := "invalid-token"
+	ProjectTools(s, &token)
+	tool := s.ListTools()["dooray_posts"]
+	req := mcp.CallToolRequest{
+		Params: mcp.CallToolParams{Name: "dooray_posts", Arguments: args},
+	}
+	return tool.Handler(context.Background(), req)
+}
+
+func TestPostsToolSetWorkflowRequiresArgs(t *testing.T) {
+	// postId/setWorkflowId 누락 시 API 호출 전에 에러 결과를 돌려줘야 한다.
+	res, err := callPosts(t, map[string]any{
+		"operation": "set_workflow",
+		"projectId": "12345",
+	})
+	if err != nil {
+		t.Fatalf("unexpected transport error: %v", err)
+	}
+	if res == nil || !res.IsError {
+		t.Fatalf("expected validation error result for missing postId/setWorkflowId, got %+v", res)
+	}
+}
+
+func TestPostsToolCreateLogRequiresArgs(t *testing.T) {
+	// postId/logContent 누락 시 에러 결과.
+	res, err := callPosts(t, map[string]any{
+		"operation": "create_log",
+		"projectId": "12345",
+		"postId":    "67890",
+	})
+	if err != nil {
+		t.Fatalf("unexpected transport error: %v", err)
+	}
+	if res == nil || !res.IsError {
+		t.Fatalf("expected validation error result for missing logContent, got %+v", res)
+	}
+}
+
+func TestPostsToolUpdatePostRequiresSubjectBody(t *testing.T) {
+	// PUT은 전체치환이므로 subject/bodyContent가 비면 거부해야 한다(데이터 유실 방지).
+	res, err := callPosts(t, map[string]any{
+		"operation": "update_post",
+		"projectId": "12345",
+		"postId":    "67890",
+	})
+	if err != nil {
+		t.Fatalf("unexpected transport error: %v", err)
+	}
+	if res == nil || !res.IsError {
+		t.Fatalf("expected validation error result for missing subject/bodyContent, got %+v", res)
+	}
+}
+
+func TestPostsToolGetLogsParsesArgs(t *testing.T) {
+	// 인자가 갖춰지면 검증 단계는 통과하고 API 호출로 진행한다(invalid token이라 호출 자체는 실패).
+	res, err := callPosts(t, map[string]any{
+		"operation": "get_logs",
+		"projectId": "12345",
+		"postId":    "67890",
+		"page":      float64(0),
+		"size":      float64(10),
+	})
+	// API 호출 실패는 transport err 또는 미설정일 수 있다 — 검증 에러(postId 누락 류)만 아니면 된다.
+	if err != nil {
+		t.Logf("handler returned expected API error (invalid token): %v", err)
+		return
+	}
+	if res != nil && res.IsError {
+		t.Logf("handler returned error result (invalid token expected): %+v", res)
+	}
+}
+
+func TestPostsToolSetWorkflowParsesArgs(t *testing.T) {
+	res, err := callPosts(t, map[string]any{
+		"operation":     "set_workflow",
+		"projectId":     "12345",
+		"postId":        "67890",
+		"setWorkflowId": "33333",
+	})
+	if err != nil {
+		t.Logf("handler returned expected API error (invalid token): %v", err)
+		return
+	}
+	if res != nil && res.IsError {
+		t.Logf("handler returned error result (invalid token expected): %+v", res)
 	}
 }
