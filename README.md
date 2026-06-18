@@ -353,6 +353,8 @@ DM 전송, 채널 메시지 전송, 채널 목록/로그 조회를 하나의 도
 | postId | O | 업무 ID |
 | page / size | X | 페이지(기본 0), 페이지 크기(기본 20) |
 
+> **게시글 태그 부분 수정(add/remove)은 공개 API에 없음 (2026-06 검증).** 웹 UI가 쓰는 `POST nhnent.dooray.com/v2/wapi/projects/{pid}/posts/modify-tags`(body `{postIdList, addTagIdList, removeTagIdList}`)는 **브라우저 쿠키 세션 인증 전용**이라 `dooray-api` 토큰으로는 401이고, 공개 API(`api.dooray.com`)엔 어떤 경로(`.../posts/modify-tags`, `.../posts/{id}/tags`, POST/PUT)로도 404다. 따라서 태그 변경은 `update_post`(PUT 전체치환)로만 가능하다. 본문을 건드리지 않고 태그만 바꾸려면 `get_post`로 현재 subject/body/users/tags를 읽어 tagIds만 병합한 뒤 `update_post`를 호출하는 헬퍼(예: `add_tags` op)를 두는 것이 정석. (향후 추가 후보.)
+
 ### `os`
 
 | 파라미터 | 필수 | 설명 |
