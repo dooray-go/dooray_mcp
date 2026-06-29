@@ -199,6 +199,34 @@ func TestMessengerSendChannelMissingMessage(t *testing.T) {
 	}
 }
 
+func TestMessengerReplyThreadMissingArgs(t *testing.T) {
+	s := newTestServer()
+	token := "invalid-token"
+	MessengerTools(s, &token)
+
+	tool := s.ListTools()["dooray_messenger"]
+
+	// reply_thread requires channelId, parentMessageId, and message.
+	// Each missing one must yield an error result (not a real API call).
+	cases := []map[string]any{
+		{"operation": "reply_thread", "parentMessageId": "p-1", "message": "hi"}, // no channelId
+		{"operation": "reply_thread", "channelId": "c-1", "message": "hi"},       // no parentMessageId
+		{"operation": "reply_thread", "channelId": "c-1", "parentMessageId": "p-1"}, // no message
+	}
+	for i, args := range cases {
+		req := mcp.CallToolRequest{
+			Params: mcp.CallToolParams{Name: "dooray_messenger", Arguments: args},
+		}
+		res, err := tool.Handler(context.Background(), req)
+		if err != nil {
+			t.Fatalf("case %d: unexpected error: %v", i, err)
+		}
+		if res == nil || !res.IsError {
+			t.Fatalf("case %d: expected error result for missing required arg", i)
+		}
+	}
+}
+
 func TestMessengerToolCount(t *testing.T) {
 	s := newTestServer()
 	token := "test-token"
