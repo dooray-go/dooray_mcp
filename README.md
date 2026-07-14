@@ -1,3 +1,5 @@
+> 해당 기능은 비공식이며 , 커뮤니티 기여로 작성하는 도구입니다. NHN Dooray 서비스에서 제공하는 기능이 아님을 밝혀 둡니다.
+
 # dooray_mcp
 
 Dooray! 를 Claude 등 MCP 호환 AI 클라이언트에서 사용할 수 있도록 해 주는 **MCP (Model Context Protocol) 서버**입니다.
